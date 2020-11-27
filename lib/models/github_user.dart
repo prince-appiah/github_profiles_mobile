@@ -67,7 +67,7 @@ class GithubUser {
         name: json["name"],
         company: json["company"],
         blog: json["blog"],
-        location: json["location"] ?? "Location Unknown",
+        location: json["location"] ?? "N/A",
         email: json["email"],
         hireable: json["hireable"],
         bio: json["bio"],
