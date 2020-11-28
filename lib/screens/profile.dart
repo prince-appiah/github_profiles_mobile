@@ -20,7 +20,7 @@ class Profile extends StatelessWidget {
       body: Container(
         child: SingleChildScrollView(
           child: Column(
-            children: [
+            children: <Widget>[
               // user avatar with a background
               Container(
                 padding: const EdgeInsets.all(20.0),
@@ -37,10 +37,13 @@ class Profile extends StatelessWidget {
                 child: Column(
                   // mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(user.avatarUrl),
-                      radius: 60.0,
+                  children: <Widget>[
+                    Hero(
+                      tag: user.login,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(user.avatarUrl),
+                        radius: 60.0,
+                      ),
                     ),
                     SizedBox(height: 10.0),
                     Text(
@@ -54,9 +57,9 @@ class Profile extends StatelessWidget {
                     SizedBox(height: 10.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                      children: <Widget>[
                         Icon(
-                          Icons.location_city_outlined,
+                          Icons.my_location_outlined,
                           color: Colors.white,
                           size: 25.0,
                         ),
@@ -72,22 +75,13 @@ class Profile extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // Text(
-                //   'User Above and name here',
-                //   style: TextStyle(
-                //     color: Colors.white,
-                //     fontSize: 23.0,
-                //     fontWeight: FontWeight.bold,
-                //   ),
-                // ),
               ),
               // Bio
               Container(
                 padding: const EdgeInsets.all(20.0),
                 width: size.width,
                 child: Column(
-                  children: [
+                  children: <Widget>[
                     Text(
                       'Bio',
                       style: TextStyle(
@@ -114,9 +108,9 @@ class Profile extends StatelessWidget {
                 width: size.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
+                  children: <Widget>[
                     Column(
-                      children: [
+                      children: <Widget>[
                         Text(
                           'Followers',
                           style: TextStyle(
@@ -137,7 +131,7 @@ class Profile extends StatelessWidget {
                       ],
                     ),
                     Column(
-                      children: [
+                      children: <Widget>[
                         Text(
                           'Following',
                           style: TextStyle(
@@ -158,7 +152,7 @@ class Profile extends StatelessWidget {
                       ],
                     ),
                     Column(
-                      children: [
+                      children: <Widget>[
                         Text(
                           'Repositories',
                           style: TextStyle(
@@ -181,12 +175,32 @@ class Profile extends StatelessWidget {
                   ],
                 ),
               ),
-              // pull requests, commits, contributions
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                width: size.width,
-                child: Row(
-                  children: [],
+
+              // View profile on Github
+              GestureDetector(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.all(20.0),
+                  margin: const EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  width: size.width * 0.85,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'View Profile on Github',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ],

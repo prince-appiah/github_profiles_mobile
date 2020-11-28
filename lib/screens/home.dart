@@ -76,14 +76,21 @@ class _HomeState extends State<Home> {
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 10),
                                 tileColor: Colors.grey[300],
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(user.avatarUrl),
+                                leading: Hero(
+                                  tag: user.login,
+                                  child: CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(user.avatarUrl),
+                                  ),
                                 ),
                                 subtitle: Text(user.login),
                                 title: Text(user.name),
                                 onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (ctx) => Profile(user: user)));
+                                  Navigator.of(context).push(PageRouteBuilder(
+                                      transitionDuration:
+                                          Duration(milliseconds: 850),
+                                      pageBuilder: (ctx, animation, child) =>
+                                          Profile(user: user)));
                                 },
                               ),
                             ],
