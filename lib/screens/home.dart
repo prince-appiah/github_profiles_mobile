@@ -1,8 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:github_profiles/models/github_user.dart';
+
+import 'package:github_profiles/screens/home.dart';
+
+import '../models/github_user.dart';
+import 'profile.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -11,107 +14,131 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   TextEditingController _searchController = new TextEditingController();
-  Future<GithubUser> _githubUser;
+  // GithubUser _user;
+
+  Future<GithubUser> _findGithubUser;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Github Profiles')),
+      appBar: AppBar(
+        title: Text('Github Profiles'),
+      ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          children: [
+          children: <Widget>[
             TextField(
               controller: _searchController,
+              keyboardType: TextInputType.text,
+              autocorrect: false,
+              enableSuggestions: false,
               decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  iconSize: 30.0,
+                  icon: Icon(Icons.search_outlined, color: Colors.black38),
+                  onPressed: () {
+                    final user = fetchGithubUser(_searchController.text);
+
+                    setState(() {
+                      _findGithubUser = user;
+                    });
+                  },
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  gapPadding: 20.0,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  gapPadding: 20.0,
+                ),
                 hintText: 'Search by username...',
-                // suffixIcon: Icon(Icons.search),
               ),
             ),
-            SizedBox(height: 30),
-            FutureBuilder<GithubUser>(
-              future: _githubUser,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                if (snapshot.data == null) {
-                  return Center(
-                    child: Text('Could not fetch users, please search again'),
-                  );
-                }
-
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('User not found'),
-                  );
-                }
-
-                final _githubUser = snapshot.data;
-                return Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 30.0,
-                      backgroundImage: NetworkImage(_githubUser.avatarUrl),
-                    ),
-                    SizedBox(height: 20),
-                    Text(_githubUser.login,
-                        style: Theme.of(context).textTheme.headline5),
-                    SizedBox(height: 20),
-                    Text(_githubUser.location,
-                        style: Theme.of(context).textTheme.headline5),
-                    SizedBox(height: 20),
-                    // TODO: Fix json mapping and display other user details
-                    // Text(_githubUser.email,
-                    //     style: Theme.of(context).textTheme.headline5),
-                    // SizedBox(height: 20),
-                    // Text(_githubUser.login,
-                    //     style: Theme.of(context).textTheme.headline5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            Text('Repositories'),
-                            Text(_githubUser.publicRepos.toString()),
+            SizedBox(height: 20.0),
+            /* Main scrollable content goes here */
+            Container(
+              child: SingleChildScrollView(
+                child: FutureBuilder<GithubUser>(
+                  future: _findGithubUser,
+                  builder: (ctx, snapshot) {
+                    // return data
+                    if (snapshot.hasData) {
+                      final user = snapshot.data;
+                      return Column(
+                        children: <Widget>[
+                          ListView(
+                            shrinkWrap: true,
+                            children: <Widget>[
+                              ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                tileColor: Colors.grey[300],
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(user.avatarUrl),
+                                ),
+                                subtitle: Text(user.login),
+                                title: Text(user.name),
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (ctx) => Profile(user: user)));
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    } else if (snapshot.hasError) {
+                      return Container(
+                        margin: EdgeInsets.only(top: 30.0),
+                        child: Column(
+                          children: <Widget>[
+                            Icon(Icons.error_outline_outlined),
+                            Text('An error occurred')
                           ],
                         ),
-                        Column(
-                          children: [
-                            Text('Followers'),
-                            Text(_githubUser.followers.toString()),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text('Following'),
-                            Text(_githubUser.following.toString()),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+                      );
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+
+                //  Column(
+                //   children: <Widget>[
+                //     ListView(
+                //       shrinkWrap: true,
+                //       children: <Widget>[
+                //         ListTile(
+                //           // leading: Icon(Icons.supervised_user_circle),
+                //           leading: CircleAvatar(),
+                //           title: Text('Github User'),
+                //           trailing: Icon(Icons.remove_red_eye_outlined),
+                //           onTap: () {
+                //             Navigator.of(context).push(
+                //                 MaterialPageRoute(builder: (ctx) => Profile()));
+                //           },
+                //         ),
+                //       ],
+                //     ),
+                //   ],
+                // ),
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _githubUser = fetchGithubUser(_searchController.text);
-          });
-        },
-        child: Icon(Icons.search),
       ),
     );
   }
 }
 
 Future<GithubUser> fetchGithubUser(String user) async {
-  final response = await http.get('https://api.github.com/users/$user');
+  var response = await http.get('https://api.github.com/users/$user');
 
   if (response.statusCode == 200) {
     return GithubUser.fromJson(jsonDecode(response.body));
